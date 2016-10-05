@@ -16,6 +16,7 @@ import android.nfc.tech.NfcV;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MotionEvent;
+import android.view.View;
 import android.widget.ExpandableListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -46,6 +47,33 @@ public class MainActivity extends Activity {
         currentTagView.setText("Loading...");
 
         expandableListView = (ExpandableListView) findViewById(R.id.expandableListView);
+        expandableListView.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                final float swipeThreshold = 150;
+
+                switch(event.getAction())
+                {
+                    case MotionEvent.ACTION_DOWN:
+                        touchDownX = event.getX();
+                        break;
+
+                    case MotionEvent.ACTION_UP:
+                        touchUpX = event.getX();
+                        final float deltaX = touchUpX - touchDownX;
+
+                        if (deltaX > swipeThreshold) {
+                            showPreviousTag();
+                        } else if (deltaX < -swipeThreshold) {
+                            showNextTag();
+                        }
+
+                        break;
+                }
+
+                return false;
+            }
+        });
 
         adapter = NfcAdapter.getDefaultAdapter(this);
     }
@@ -105,33 +133,6 @@ public class MainActivity extends Activity {
         showTag();
     }
 
-    @Override
-    public boolean onTouchEvent(MotionEvent event)
-    {
-        final float swipeThreshold = 30;
-
-        switch(event.getAction())
-        {
-            case MotionEvent.ACTION_DOWN:
-                touchDownX = event.getX();
-                break;
-
-            case MotionEvent.ACTION_UP:
-                touchUpX = event.getX();
-                final float deltaX = touchUpX - touchDownX;
-
-                if (deltaX > swipeThreshold) {
-                    showPreviousTag();
-                } else if (deltaX < -swipeThreshold) {
-                    showNextTag();
-                }
-
-                break;
-        }
-
-        return super.onTouchEvent(event);
-    }
-
     private void showPreviousTag() {
         if (--currentTagIndex < 0) currentTagIndex = tags.size() - 1;
 
@@ -157,7 +158,8 @@ public class MainActivity extends Activity {
         final int count = expandableListView.getCount();
         for (int i = 0; i < count; i++) expandableListView.expandGroup(i);
 
-        currentTagView.setText(tagWrapper.getId() + "\n" + (currentTagIndex+1) + "/" + tags.size());
+        currentTagView.setText("Tag " + tagWrapper.getId() +
+                " (" + (currentTagIndex+1) + "/" + tags.size() + ")");
     }
 
     private final List<String> getTagInfo(final Tag tag, final String tech) {
