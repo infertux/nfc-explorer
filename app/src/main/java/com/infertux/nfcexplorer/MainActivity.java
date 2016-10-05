@@ -31,13 +31,10 @@ public class MainActivity extends Activity {
     private NfcAdapter adapter = null;
     private PendingIntent pendingIntent = null;
     private TextView textView;
-
-    private ArrayList<TagWrapper> tags = new ArrayList<TagWrapper>();
-    private int currentTagIndex = -1;
-
     private ExpandableListView expandableListView;
-    private ExpandableListAdapter expandableListAdapter;
-    private List<String> expandableListTitle;
+
+    static private ArrayList<TagWrapper> tags = new ArrayList<TagWrapper>();
+    static private int currentTagIndex = -1;
 
     @Override
     public void onCreate(final Bundle savedState) {
@@ -47,6 +44,8 @@ public class MainActivity extends Activity {
 
         textView = (TextView) findViewById(R.id.currentTag);
         textView.setText("Loading...");
+
+        expandableListView = (ExpandableListView) findViewById(R.id.expandableListView);
 
         adapter = NfcAdapter.getDefaultAdapter(this);
     }
@@ -66,6 +65,8 @@ public class MainActivity extends Activity {
 
             textView.setText("Scan a tag");
         }
+
+        showTag();
 
         adapter.enableForegroundDispatch(this, pendingIntent, null, null);
     }
@@ -113,12 +114,13 @@ public class MainActivity extends Activity {
     }
 
     private void showTag() {
+        if (currentTagIndex == -1) return;
+
         final TagWrapper tagWrapper = tags.get(currentTagIndex);
         final TagTechList techList = tagWrapper.techList;
 
-        expandableListView = (ExpandableListView) findViewById(R.id.expandableListView);
-        expandableListTitle = new ArrayList<String>(techList.keySet());
-        expandableListAdapter = new CustomExpandableListAdapter(this, expandableListTitle, techList);
+        final List<String> expandableListTitle = new ArrayList<String>(techList.keySet());
+        final ExpandableListAdapter expandableListAdapter = new CustomExpandableListAdapter(this, expandableListTitle, techList);
         expandableListView.setAdapter(expandableListAdapter);
 
         expandableListView.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
