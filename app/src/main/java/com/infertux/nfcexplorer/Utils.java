@@ -1,5 +1,10 @@
 package com.infertux.nfcexplorer;
 
+import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
+import android.content.Intent;
+
 import java.util.TimeZone;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -31,5 +36,24 @@ final class Utils {
         DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
         df.setTimeZone(tz);
         return df.format(new Date());
+    }
+
+
+    public static void showNfcSettingsDialog(final Activity app) {
+        new AlertDialog.Builder(app)
+                .setTitle("NFC is disabled")
+                .setMessage("You must enable NFC to use this app.")
+                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        app.startActivity(new Intent(android.provider.Settings.ACTION_NFC_SETTINGS));
+                    }
+                })
+                .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        app.finish();
+                    }
+                })
+                .setIcon(android.R.drawable.ic_dialog_alert)
+                .show();
     }
 }

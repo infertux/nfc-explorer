@@ -1,9 +1,7 @@
 package com.infertux.nfcexplorer;
 
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.app.PendingIntent;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.nfc.NdefMessage;
 import android.nfc.NdefRecord;
@@ -18,23 +16,22 @@ import android.nfc.tech.NfcV;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.widget.ExpandableListAdapter;
 import android.widget.ExpandableListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
 public class MainActivity extends Activity {
-    private NfcAdapter adapter = null;
-    private PendingIntent pendingIntent = null;
-    private TextView textView;
-    private ExpandableListView expandableListView;
-
     static private ArrayList<TagWrapper> tags = new ArrayList<TagWrapper>();
     static private int currentTagIndex = -1;
+
+    private NfcAdapter adapter = null;
+    private PendingIntent pendingIntent = null;
+
+    private TextView currentTagView;
+    private ExpandableListView expandableListView;
 
     @Override
     public void onCreate(final Bundle savedState) {
@@ -42,8 +39,8 @@ public class MainActivity extends Activity {
 
         setContentView(R.layout.activity_main);
 
-        textView = (TextView) findViewById(R.id.currentTag);
-        textView.setText("Loading...");
+        currentTagView = (TextView) findViewById(R.id.currentTagView);
+        currentTagView.setText("Loading...");
 
         expandableListView = (ExpandableListView) findViewById(R.id.expandableListView);
 
@@ -55,7 +52,7 @@ public class MainActivity extends Activity {
         super.onResume();
 
         if (!adapter.isEnabled()) {
-            enableNfcAdapterDialog(this);
+            Utils.showNfcSettingsDialog(this);
             return;
         }
 
@@ -63,7 +60,7 @@ public class MainActivity extends Activity {
             pendingIntent = PendingIntent.getActivity(this, 0,
                     new Intent(this, getClass()).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP), 0);
 
-            textView.setText("Scan a tag");
+            currentTagView.setText("Scan a tag");
         }
 
         showTag();
@@ -92,12 +89,12 @@ public class MainActivity extends Activity {
 
         for (String tech : tag.getTechList()) {
             tech = tech.replace("android.nfc.tech.", "");
-            List<String> info = getInfo(tag, tech);
+            List<String> info = getTagInfo(tag, tech);
             tagWrapper.techList.put(tech, info);
         }
 
         tags.add(tagWrapper);
-        currentTagIndex++;
+        currentTagIndex = tags.size() - 1;
         showTag();
     }
 
@@ -114,41 +111,24 @@ public class MainActivity extends Activity {
     }
 
     private void showTag() {
-        if (currentTagIndex == -1) return;
+        if (tags.size() == 0) return;
 
         final TagWrapper tagWrapper = tags.get(currentTagIndex);
         final TagTechList techList = tagWrapper.techList;
-
         final List<String> expandableListTitle = new ArrayList<String>(techList.keySet());
-        final ExpandableListAdapter expandableListAdapter = new CustomExpandableListAdapter(this, expandableListTitle, techList);
-        expandableListView.setAdapter(expandableListAdapter);
 
-        expandableListView.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
-            @Override
-            public boolean onChildClick(ExpandableListView parent, View v,
-                                        int groupPosition, int childPosition, long id) {
-                Toast.makeText(
-                        getApplicationContext(),
-                        expandableListTitle.get(groupPosition)
-                                + " -> "
-                                + techList.get(
-                                expandableListTitle.get(groupPosition)).get(
-                                childPosition), Toast.LENGTH_SHORT
-                ).show();
-
-                return false;
-            }
-        });
+        expandableListView.setAdapter(
+                new CustomExpandableListAdapter(this, expandableListTitle, techList));
 
         final int count = expandableListView.getCount();
         for (int i = 0; i < count; i++) {
             expandableListView.expandGroup(i);
         }
 
-        textView.setText(tagWrapper.getId() + "\n" + (currentTagIndex+1) + "/" + tags.size());
+        currentTagView.setText(tagWrapper.getId() + "\n" + (currentTagIndex+1) + "/" + tags.size());
     }
 
-    private final List<String> getInfo(final Tag tag, final String tech) {
+    private final List<String> getTagInfo(final Tag tag, final String tech) {
         List<String> info = new ArrayList<String>();
 
         switch (tech) {
@@ -247,23 +227,5 @@ public class MainActivity extends Activity {
         }
 
         return info;
-    }
-
-    private void enableNfcAdapterDialog(final Activity app) {
-        new AlertDialog.Builder(this)
-                .setTitle("NFC is disabled")
-                .setMessage("You must enable NFC to use this app.")
-                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        startActivity(new Intent(android.provider.Settings.ACTION_NFC_SETTINGS));
-                    }
-                })
-                .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        app.finish();
-                    }
-                })
-                .setIcon(android.R.drawable.ic_dialog_alert)
-                .show();
     }
 }

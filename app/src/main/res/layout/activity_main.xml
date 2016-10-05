@@ -22,7 +22,7 @@
         <TextView
             android:text="Scan a tag"
             android:layout_height="wrap_content"
-            android:id="@+id/currentTag"
+            android:id="@+id/currentTagView"
             android:textAlignment="center"
             android:layout_width="160dp" />
 
