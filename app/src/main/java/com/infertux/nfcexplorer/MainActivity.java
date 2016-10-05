@@ -6,6 +6,7 @@ import android.app.PendingIntent;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.nfc.NdefMessage;
+import android.nfc.NdefRecord;
 import android.nfc.NfcAdapter;
 import android.nfc.Tag;
 import android.nfc.tech.IsoDep;
@@ -148,21 +149,25 @@ public class MainActivity extends Activity {
             case "Ndef":
                 Ndef ndefTag = Ndef.get(tag);
                 NdefMessage ndefMessage = null;
-                String message;
 
                 try {
                     ndefTag.connect();
                     ndefMessage = ndefTag.getNdefMessage();
                     ndefTag.close();
 
-                    message = ndefMessage.toString();
+                    for (final NdefRecord record : ndefMessage.getRecords()) {
+                        final String id = record.getId().length == 0 ? "null" : Utils.bytesToHex(record.getId());
+                        info.add("record[" + id + "].tnf: " + record.getTnf());
+                        info.add("record[" + id + "].type: " + Utils.bytesToHexAndString(record.getType()));
+                        info.add("record[" + id + "].payload: " + Utils.bytesToHexAndString(record.getPayload()));
+                    }
+
+                    info.add("messageSize: " + ndefMessage.getByteArrayLength());
+
                 } catch (final Exception e) {
                     e.printStackTrace();
-                    message = "Exception: " + e.toString();
+                    info.add("error reading message: " + e.toString());
                 }
-
-                info.add("message: " + message);
-                info.add("message.size: " + ndefMessage.getByteArrayLength());
 
                 info.add("canMakeReadOnly: " + ndefTag.canMakeReadOnly());
                 info.add("isWritable: " + ndefTag.isWritable());
