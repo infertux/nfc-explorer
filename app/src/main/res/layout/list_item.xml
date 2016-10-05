@@ -5,7 +5,8 @@
         android:id="@+id/expandedListItem"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:paddingLeft="?android:attr/expandableListPreferredChildPaddingLeft"
+        android:paddingLeft="12dp"
         android:paddingTop="1dp"
-        android:paddingBottom="1dp" />
+        android:paddingBottom="1dp"
+        android:paddingRight="12dp" />
 </LinearLayout>
