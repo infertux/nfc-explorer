@@ -116,12 +116,12 @@ public class MainActivity extends Activity {
         ArrayList<String> misc = new ArrayList<String>();
         misc.add("scanned at: " + Utils.now());
         misc.add("tag data: " + intent.getDataString());
-        tagWrapper.techList.put("misc", misc);
+        tagWrapper.techList.put("Misc", misc);
 
         for (String tech : tag.getTechList()) {
             tech = tech.replace("android.nfc.tech.", "");
             List<String> info = getTagInfo(tag, tech);
-            tagWrapper.techList.put(tech, info);
+            tagWrapper.techList.put("Technology: " + tech, info);
         }
 
         if (tags.size() == 1) {
