@@ -15,9 +15,10 @@ import android.nfc.tech.NfcF;
 import android.nfc.tech.NfcV;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.View;
+import android.view.MotionEvent;
 import android.widget.ExpandableListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -32,6 +33,8 @@ public class MainActivity extends Activity {
 
     private TextView currentTagView;
     private ExpandableListView expandableListView;
+
+    private float touchDownX, touchUpX;
 
     @Override
     public void onCreate(final Bundle savedState) {
@@ -93,18 +96,49 @@ public class MainActivity extends Activity {
             tagWrapper.techList.put(tech, info);
         }
 
+        if (tags.size() == 1) {
+            Toast.makeText(this, "Swipe right to see previous tags", Toast.LENGTH_LONG).show();
+        }
+
         tags.add(tagWrapper);
         currentTagIndex = tags.size() - 1;
         showTag();
     }
 
-    public void showPreviousTag(View _view) {
+    @Override
+    public boolean onTouchEvent(MotionEvent event)
+    {
+        final float swipeThreshold = 30;
+
+        switch(event.getAction())
+        {
+            case MotionEvent.ACTION_DOWN:
+                touchDownX = event.getX();
+                break;
+
+            case MotionEvent.ACTION_UP:
+                touchUpX = event.getX();
+                final float deltaX = touchUpX - touchDownX;
+
+                if (deltaX > swipeThreshold) {
+                    showPreviousTag();
+                } else if (deltaX < -swipeThreshold) {
+                    showNextTag();
+                }
+
+                break;
+        }
+
+        return super.onTouchEvent(event);
+    }
+
+    private void showPreviousTag() {
         if (--currentTagIndex < 0) currentTagIndex = tags.size() - 1;
 
         showTag();
     }
 
-    public void showNextTag(View _view) {
+    private void showNextTag() {
         if (++currentTagIndex >= tags.size()) currentTagIndex = 0;
 
         showTag();
@@ -115,15 +149,13 @@ public class MainActivity extends Activity {
 
         final TagWrapper tagWrapper = tags.get(currentTagIndex);
         final TagTechList techList = tagWrapper.techList;
-        final List<String> expandableListTitle = new ArrayList<String>(techList.keySet());
+        final ArrayList<String> expandableListTitle = new ArrayList<String>(techList.keySet());
 
         expandableListView.setAdapter(
                 new CustomExpandableListAdapter(this, expandableListTitle, techList));
 
         final int count = expandableListView.getCount();
-        for (int i = 0; i < count; i++) {
-            expandableListView.expandGroup(i);
-        }
+        for (int i = 0; i < count; i++) expandableListView.expandGroup(i);
 
         currentTagView.setText(tagWrapper.getId() + "\n" + (currentTagIndex+1) + "/" + tags.size());
     }

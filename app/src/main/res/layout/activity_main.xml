@@ -1,53 +1,25 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fitsSystemWindows="true"
+    android:layout_width="match_parent"
     tools:context=".MainActivity"
     android:orientation="vertical">
 
-    <LinearLayout
-        android:orientation="horizontal"
+    <TextView
+        android:text="Scan a tag"
+        android:id="@+id/currentTagView"
+        android:textAlignment="center"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:textStyle="bold"
+        android:layout_height="40dp"
+        android:textSize="15sp" />
 
-        <Button
-            android:layout_height="wrap_content"
-            android:id="@+id/buttonPreviousTag"
-            android:layout_weight="1"
-            android:text="Previous"
-            android:onClick="showPreviousTag"
-            android:layout_width="match_parent" />
-
-        <TextView
-            android:text="Scan a tag"
-            android:layout_height="wrap_content"
-            android:id="@+id/currentTagView"
-            android:textAlignment="center"
-            android:layout_width="160dp" />
-
-        <Button
-            android:text="Next"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/buttonNextTag"
-            android:layout_weight="1"
-            android:onClick="showNextTag" />
-    </LinearLayout>
-
-    <LinearLayout
-        android:orientation="vertical"
+    <ExpandableListView
+        android:id="@+id/expandableListView"
+        android:layout_height="match_parent"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_weight="1">
+        android:indicatorLeft="?android:attr/expandableListPreferredItemIndicatorLeft"
+        android:divider="@android:color/darker_gray"
+        android:dividerHeight="0.5dp" />
 
-        <ExpandableListView
-            android:id="@+id/expandableListView"
-            android:layout_height="match_parent"
-            android:layout_width="match_parent"
-            android:indicatorLeft="?android:attr/expandableListPreferredItemIndicatorLeft"
-            android:divider="@android:color/darker_gray"
-            android:dividerHeight="0.5dp"
-            android:layout_above="@+id/textView" />
-    </LinearLayout>
 </LinearLayout>
