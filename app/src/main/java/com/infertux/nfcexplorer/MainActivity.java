@@ -126,6 +126,8 @@ public class MainActivity extends Activity {
 
         switch (tech) {
             case "NfcA":
+                info.add("aka ISO 14443-3A");
+
                 NfcA nfcATag = NfcA.get(tag);
                 info.add("atqa: " + Utils.bytesToHexAndString(nfcATag.getAtqa()));
                 info.add("sak: " + nfcATag.getSak());
@@ -133,6 +135,8 @@ public class MainActivity extends Activity {
                 break;
 
             case "NfcF":
+                info.add("aka JIS 6319-4");
+
                 NfcF nfcFTag = NfcF.get(tag);
                 info.add("manufacturer: " + Utils.bytesToHex(nfcFTag.getManufacturer()));
                 info.add("systemCode: " + Utils.bytesToHex(nfcFTag.getSystemCode()));
@@ -140,6 +144,8 @@ public class MainActivity extends Activity {
                 break;
 
             case "NfcV":
+                info.add("aka ISO 15693");
+                
                 NfcV nfcVTag = NfcV.get(tag);
                 info.add("dsfId: " + nfcVTag.getDsfId());
                 info.add("responseFlags: " + nfcVTag.getResponseFlags());
@@ -169,9 +175,20 @@ public class MainActivity extends Activity {
                     info.add("error reading message: " + e.toString());
                 }
 
+                HashMap<String, String> typeMap = new HashMap<String, String>();
+                typeMap.put(Ndef.NFC_FORUM_TYPE_1, "typically Innovision Topaz");
+                typeMap.put(Ndef.NFC_FORUM_TYPE_2, "typically NXP MIFARE Ultralight");
+                typeMap.put(Ndef.NFC_FORUM_TYPE_3, "typically Sony Felica");
+                typeMap.put(Ndef.NFC_FORUM_TYPE_4, "typically NXP MIFARE Desfire");
+
+                String type = ndefTag.getType();
+                if (typeMap.get(type) != null) {
+                    type += " (" + typeMap.get(type) + ")";
+                }
+                info.add("type: " + type);
+
                 info.add("canMakeReadOnly: " + ndefTag.canMakeReadOnly());
                 info.add("isWritable: " + ndefTag.isWritable());
-                info.add("type: " + ndefTag.getType());
                 info.add("maxSize: " + ndefTag.getMaxSize());
                 break;
 
@@ -188,6 +205,8 @@ public class MainActivity extends Activity {
                 break;
 
             case "IsoDep":
+                info.add("aka ISO 14443-4");
+
                 IsoDep isoDepTag = IsoDep.get(tag);
                 info.add("historicalBytes: " + Utils.bytesToHexAndString(isoDepTag.getHistoricalBytes()));
                 info.add("hiLayerResponse: " + Utils.bytesToHexAndString(isoDepTag.getHiLayerResponse()));
