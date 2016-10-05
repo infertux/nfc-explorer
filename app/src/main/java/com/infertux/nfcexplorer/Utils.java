@@ -1,6 +1,6 @@
 package com.infertux.nfcexplorer;
 
-final class Hex {
+final class Utils {
     private final static char[] hexArray = "0123456789ABCDEF".toCharArray();
 
     public final static String bytesToHex(byte[] bytes) {

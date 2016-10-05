@@ -80,7 +80,7 @@ public class MainActivity extends Activity {
         tag = intent.getParcelableExtra(NfcAdapter.EXTRA_TAG);
         String[] techList = tag.getTechList();
 
-        textView.setText("Discovered tag with ID " + Hex.bytesToHex(tag.getId()) + " via " + intent.getAction());
+        textView.setText("Discovered tag with ID " + Utils.bytesToHex(tag.getId()) + " via " + intent.getAction());
         textView.append("\n\ndataString: " + intent.getDataString());
 
         final HashMap<String, List<String>> expandableListDetail = new HashMap<String, List<String>>();
@@ -125,7 +125,7 @@ public class MainActivity extends Activity {
         switch (tech) {
             case "NfcA":
                 NfcA nfcATag = NfcA.get(tag);
-                info.add("atqa: " + Hex.bytesToHexAndString(nfcATag.getAtqa()));
+                info.add("atqa: " + Utils.bytesToHexAndString(nfcATag.getAtqa()));
                 info.add("sak: " + nfcATag.getSak());
                 info.add("maxTransceiveLength: " + nfcATag.getMaxTransceiveLength());
                 break;
@@ -176,8 +176,8 @@ public class MainActivity extends Activity {
 
             case "IsoDep":
                 IsoDep isoDepTag = IsoDep.get(tag);
-                info.add("historicalBytes: " + Hex.bytesToHexAndString(isoDepTag.getHistoricalBytes()));
-                info.add("hiLayerResponse: " + Hex.bytesToHexAndString(isoDepTag.getHiLayerResponse()));
+                info.add("historicalBytes: " + Utils.bytesToHexAndString(isoDepTag.getHistoricalBytes()));
+                info.add("hiLayerResponse: " + Utils.bytesToHexAndString(isoDepTag.getHiLayerResponse()));
                 info.add("timeout: " + isoDepTag.getTimeout());
                 info.add("extendedLengthApduSupported: " + isoDepTag.isExtendedLengthApduSupported());
                 info.add("maxTransceiveLength: " + isoDepTag.getMaxTransceiveLength());
