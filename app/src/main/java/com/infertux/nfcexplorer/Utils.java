@@ -1,5 +1,10 @@
 package com.infertux.nfcexplorer;
 
+import java.util.TimeZone;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 final class Utils {
     private final static char[] hexArray = "0123456789ABCDEF".toCharArray();
 
@@ -19,5 +24,12 @@ final class Utils {
         if (bytes == null) return null;
 
         return bytesToHex(bytes) + " (" + new String(bytes) + ")";
+    }
+
+    public final static String now() {
+        TimeZone tz = TimeZone.getTimeZone("UTC");
+        DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+        df.setTimeZone(tz);
+        return df.format(new Date());
     }
 }

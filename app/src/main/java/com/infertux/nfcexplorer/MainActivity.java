@@ -31,12 +31,13 @@ public class MainActivity extends Activity {
     private NfcAdapter adapter = null;
     private PendingIntent pendingIntent = null;
     private TextView textView;
-    private Tag tag;
+
+    private ArrayList<TagWrapper> tags = new ArrayList<TagWrapper>();
+    private int currentTagIndex = -1;
 
     private ExpandableListView expandableListView;
     private ExpandableListAdapter expandableListAdapter;
     private List<String> expandableListTitle;
-    private HashMap<String, List<String>> expandableListDetail;
 
     @Override
     public void onCreate(final Bundle savedState) {
@@ -44,7 +45,7 @@ public class MainActivity extends Activity {
 
         setContentView(R.layout.activity_main);
 
-        textView = (TextView) findViewById(R.id.textView);
+        textView = (TextView) findViewById(R.id.currentTag);
         textView.setText("Loading...");
 
         adapter = NfcAdapter.getDefaultAdapter(this);
@@ -79,23 +80,45 @@ public class MainActivity extends Activity {
     public void onNewIntent(Intent intent) {
         Log.d("onNewIntent", "Discovered tag with intent " + intent);
 
-        tag = intent.getParcelableExtra(NfcAdapter.EXTRA_TAG);
-        String[] techList = tag.getTechList();
+        Tag tag = intent.getParcelableExtra(NfcAdapter.EXTRA_TAG);
+        String tagId = Utils.bytesToHex(tag.getId());
+        TagWrapper tagWrapper = new TagWrapper(tagId);
 
-        textView.setText("Discovered tag with ID " + Utils.bytesToHex(tag.getId()) + " via " + intent.getAction());
-        textView.append("\n\ndataString: " + intent.getDataString());
+        ArrayList<String> misc = new ArrayList<String>();
+        misc.add("scanned at: " + Utils.now());
+        misc.add("tag data: " + intent.getDataString());
+        tagWrapper.techList.put("misc", misc);
 
-        final HashMap<String, List<String>> expandableListDetail = new HashMap<String, List<String>>();
-
-        for (String tech : techList) {
+        for (String tech : tag.getTechList()) {
             tech = tech.replace("android.nfc.tech.", "");
-            List<String> info = getInfo(tech);
-            expandableListDetail.put(tech, info);
+            List<String> info = getInfo(tag, tech);
+            tagWrapper.techList.put(tech, info);
         }
 
+        tags.add(tagWrapper);
+        currentTagIndex++;
+        showTag();
+    }
+
+    public void showPreviousTag(View _view) {
+        if (--currentTagIndex < 0) currentTagIndex = tags.size() - 1;
+
+        showTag();
+    }
+
+    public void showNextTag(View _view) {
+        if (++currentTagIndex >= tags.size()) currentTagIndex = 0;
+
+        showTag();
+    }
+
+    private void showTag() {
+        final TagWrapper tagWrapper = tags.get(currentTagIndex);
+        final TagTechList techList = tagWrapper.techList;
+
         expandableListView = (ExpandableListView) findViewById(R.id.expandableListView);
-        expandableListTitle = new ArrayList<String>(expandableListDetail.keySet());
-        expandableListAdapter = new CustomExpandableListAdapter(this, expandableListTitle, expandableListDetail);
+        expandableListTitle = new ArrayList<String>(techList.keySet());
+        expandableListAdapter = new CustomExpandableListAdapter(this, expandableListTitle, techList);
         expandableListView.setAdapter(expandableListAdapter);
 
         expandableListView.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
@@ -106,7 +129,7 @@ public class MainActivity extends Activity {
                         getApplicationContext(),
                         expandableListTitle.get(groupPosition)
                                 + " -> "
-                                + expandableListDetail.get(
+                                + techList.get(
                                 expandableListTitle.get(groupPosition)).get(
                                 childPosition), Toast.LENGTH_SHORT
                 ).show();
@@ -119,9 +142,11 @@ public class MainActivity extends Activity {
         for (int i = 0; i < count; i++) {
             expandableListView.expandGroup(i);
         }
+
+        textView.setText(tagWrapper.getId() + "\n" + (currentTagIndex+1) + "/" + tags.size());
     }
 
-    private final List<String> getInfo(String tech) {
+    private final List<String> getInfo(final Tag tag, final String tech) {
         List<String> info = new ArrayList<String>();
 
         switch (tech) {
