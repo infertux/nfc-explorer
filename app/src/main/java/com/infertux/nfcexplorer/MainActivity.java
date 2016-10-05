@@ -12,6 +12,7 @@ import android.nfc.tech.IsoDep;
 import android.nfc.tech.MifareUltralight;
 import android.nfc.tech.Ndef;
 import android.nfc.tech.NfcA;
+import android.nfc.tech.NfcF;
 import android.nfc.tech.NfcV;
 import android.os.Bundle;
 import android.util.Log;
@@ -128,6 +129,13 @@ public class MainActivity extends Activity {
                 info.add("atqa: " + Utils.bytesToHexAndString(nfcATag.getAtqa()));
                 info.add("sak: " + nfcATag.getSak());
                 info.add("maxTransceiveLength: " + nfcATag.getMaxTransceiveLength());
+                break;
+
+            case "NfcF":
+                NfcF nfcFTag = NfcF.get(tag);
+                info.add("manufacturer: " + Utils.bytesToHex(nfcFTag.getManufacturer()));
+                info.add("systemCode: " + Utils.bytesToHex(nfcFTag.getSystemCode()));
+                info.add("maxTransceiveLength: " + nfcFTag.getMaxTransceiveLength());
                 break;
 
             case "NfcV":
