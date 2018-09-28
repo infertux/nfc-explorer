@@ -1,15 +1,18 @@
 # NFC Explorer
 
+[![Build Status](https://travis-ci.org/infertux/nfc-explorer.svg?branch=master)](https://travis-ci.org/infertux/nfc-explorer)
+
 This is a very simple Android app to scan NFC tags/cards and extract as much information as possible from them.
 The app is "read-only" and does not perform any write operations.
 
 ## Build
 
-Launch Android Studio then select "Build APK" from the Build menu.
+- Using Android Studio: select "Build APK" from the Build menu.
+- Using Gradle: `JAVA_HOME=/opt/android-studio/jre ./gradlew build`
 
 ## Install
 
-A signed APK is available in `./app/app-release.apk`.
+The APK file will be generated into `./app/build/outputs/apk/`.
 
 ## Disclaimer
 
