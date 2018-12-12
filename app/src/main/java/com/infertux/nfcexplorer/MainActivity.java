@@ -14,6 +14,7 @@ import android.nfc.tech.NfcA;
 import android.nfc.tech.NfcF;
 import android.nfc.tech.NfcV;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
@@ -21,6 +22,7 @@ import android.widget.ExpandableListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -115,7 +117,24 @@ public class MainActivity extends Activity {
 
         ArrayList<String> misc = new ArrayList<String>();
         misc.add("scanned at: " + Utils.now());
-        misc.add("tag data: " + intent.getDataString());
+
+        Parcelable[] rawMsgs = intent.getParcelableArrayExtra(NfcAdapter.EXTRA_NDEF_MESSAGES);
+
+        String tagData = "";
+
+        if (rawMsgs != null) {
+
+            NdefMessage msg = (NdefMessage) rawMsgs[0];
+            NdefRecord cardRecord = msg.getRecords()[0];
+            try {
+                tagData = readRecord(cardRecord.getPayload());
+            } catch (UnsupportedEncodingException e) {
+                Log.e("TagScan", e.getMessage());
+                return;
+            }
+        }
+
+        misc.add("tag data: " + tagData);
         tagWrapper.techList.put("Misc", misc);
 
         for (String tech : tag.getTechList()) {
@@ -132,6 +151,15 @@ public class MainActivity extends Activity {
         currentTagIndex = tags.size() - 1;
         showTag();
     }
+
+    String readRecord(byte[] payload) throws UnsupportedEncodingException {
+        String textEncoding = ((payload[0] & 128) == 0) ? "UTF-8" : "UTF-16";
+
+        int languageCodeLength = payload[0] & 63;
+
+        return new String(payload, languageCodeLength + 1, payload.length - languageCodeLength - 1, textEncoding);
+    }
+
 
     private void showPreviousTag() {
         if (--currentTagIndex < 0) currentTagIndex = tags.size() - 1;

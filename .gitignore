@@ -6,3 +6,5 @@
 /app/build/
 /build/
 /local.properties
+
+\.idea/
