@@ -2,8 +2,8 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" group="nfc-explorer/app" />
-      <module fileurl="file://$PROJECT_DIR$/nfc-explorer.iml" filepath="$PROJECT_DIR$/nfc-explorer.iml" group="nfc-explorer" />
+      <module fileurl="file://$PROJECT_DIR$/nfc-explorer.iml" filepath="$PROJECT_DIR$/nfc-explorer.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/nfc-explorer.app.iml" filepath="$PROJECT_DIR$/.idea/modules/app/nfc-explorer.app.iml" />
     </modules>
   </component>
 </project>

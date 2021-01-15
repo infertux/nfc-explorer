@@ -5,10 +5,7 @@ language: android
 # XXX: keep min & max versions in sync with `./app/build.gradle`
 android:
   components:
-    - build-tools-28.0.2
     - android-28
-    - android-25
-    - sys-img-armeabi-v7a-android-25
-    - tools
+    - build-tools-28.0.3
     - platform-tools
     - tools
